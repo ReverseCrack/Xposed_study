@@ -1,6 +1,7 @@
 package com.my.xposedhookarrowdemo;
 
 import android.net.wifi.WifiInfo;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.TextView;
 
@@ -236,13 +237,22 @@ public class Arrow implements IXposedHookLoadPackage {
         /**
          * 拦截系统方法 篡改IMEI设备号
          * */
-        XposedHelpers.findAndHookMethod("android.telephony.TelephonyManager",
-                loadPackageParam.classLoader, "getDeviceId", new XC_MethodHook() {
+        XposedBridge.hookAllMethods(TelephonyManager.class, "getImei",
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param)
+                            throws Throwable {
+                        // TODO Auto-generated method stub
+                        super.beforeHookedMethod(param);
+                    }
+
                     @Override
                     protected void afterHookedMethod(MethodHookParam param)
                             throws Throwable {
+                        // TODO Auto-generated method stub
+                        super.afterHookedMethod(param);
                         XposedBridge.log("imei：" + param.getResult());
-                        param.setResult("2432424242 (is hooked)");
+                        param.setResult("999999");
                     }
                 });
 
@@ -271,7 +281,7 @@ public class Arrow implements IXposedHookLoadPackage {
                         super.afterHookedMethod(param);
                         XposedBridge.log("WIFI IP地址：" + param.getResult());
                         // 分割字符串
-                        String[] str = "192.168.1.99".split("\\.");
+                        String[] str = "192.99.99.99".split("\\.");
                         // 定义一个字符串，用来存储反转后的IP地址
                         String ipAdress = "";
                         // for循环控制IP地址反转
