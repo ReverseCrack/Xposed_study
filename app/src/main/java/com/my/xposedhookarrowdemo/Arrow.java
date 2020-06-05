@@ -73,7 +73,8 @@ public class Arrow implements IXposedHookLoadPackage {
          * Hook 匿名内部类
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.ABClass", // 被Hook函数所在的类(包名+类名)
-                loadPackageParam.classLoader, "say", // 被Hook函数的名称ordinaryFunc
+                loadPackageParam.classLoader,
+                "say", // 被Hook函数的名称ordinaryFunc
                 String.class, // 被Hook函数的第一个参数String
                 new XC_MethodHook() {
 
@@ -108,7 +109,8 @@ public class Arrow implements IXposedHookLoadPackage {
          * Hook 匿名内部类 2
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.MainActivity$2", // 被Hook函数所在的类(包名+类名)
-                loadPackageParam.classLoader, "say2", // 被Hook函数的名称ordinaryFunc
+                loadPackageParam.classLoader,
+                "say2", // 被Hook函数的名称ordinaryFunc
                 String.class, // 被Hook函数的第一个参数String
                 new XC_MethodHook() {
 
@@ -201,7 +203,8 @@ public class Arrow implements IXposedHookLoadPackage {
          * Hook UI控件
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.MainActivity", // 被Hook函数所在的类(包名+类名)
-                loadPackageParam.classLoader, "ui_function", // 被Hook函数的名称ordinaryFunc
+                loadPackageParam.classLoader,
+                "ui_function", // 被Hook函数的名称ordinaryFunc
                 View.class, // 被Hook函数的第一个参数String
                 new XC_MethodHook() {
 
@@ -316,8 +319,7 @@ public class Arrow implements IXposedHookLoadPackage {
                     protected void afterHookedMethod(MethodHookParam param)
                             throws Throwable {
                         super.afterHookedMethod(param);
-                        XposedBridge
-                                .log("============= staic function ============");
+                        XposedBridge.log("============= staic function ============");
                     }
                 });
     }
