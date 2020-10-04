@@ -155,7 +155,7 @@ public class Arrow implements IXposedHookLoadPackage {
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.MainActivity$2", // 被Hook函数所在的类(包名+类名)
                 loadPackageParam.classLoader,
-                "say2", // 被Hook函数的名称ordinaryFunc
+                "say2", // 被Hook函数的名称say2
                 String.class, // 被Hook函数的第一个参数String
                 new XC_MethodHook() {
 
@@ -249,7 +249,7 @@ public class Arrow implements IXposedHookLoadPackage {
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.MainActivity", // 被Hook函数所在的类(包名+类名)
                 loadPackageParam.classLoader,
-                "ui_function", // 被Hook函数的名称ordinaryFunc
+                "ui_function", // 被Hook函数的名称ui_function
                 View.class, // 被Hook函数的第一个参数String
                 new XC_MethodHook() {
 
