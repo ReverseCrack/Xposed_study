@@ -70,7 +70,52 @@ public class Arrow implements IXposedHookLoadPackage {
                 });
 
         /*
-         * Hook 匿名内部类
+         * Hook 参数是自定义的类
+         */
+        //先获取到自定义的类 作为hook函数的参数
+        Class<?> param_class = XposedHelpers.findClass("com.my.xposedtargetdemo.ParamClass", loadPackageParam.classLoader);
+        XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.Util", // 被Hook函数所在的类(包名+类名)
+                loadPackageParam.classLoader, "param_isClass", // 被Hook函数的名称param_isClass
+                int.class,// 被Hook函数的第1个参数integer
+                param_class,//被Hook函数的第2个参数 自定义的类
+                new XC_MethodHook() {
+
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param)
+                            throws Throwable {
+                        super.beforeHookedMethod(param);
+                        // Hook函数之前执行的代码
+                        // 打印方法的参数信息
+                        XposedBridge.log("parma1 : " + param.args[0]);
+                        XposedBridge.log("parma2 : " + param.args[1]);
+                        // 打印堆栈查看调用关系
+                        StackTraceElement[] wodelogs = new Throwable("wodelog")
+                                .getStackTrace();
+                        for (int i = 0; i < wodelogs.length; i++) {
+                            XposedBridge.log("查看堆栈：" + wodelogs[i].toString());
+                        }
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param)
+                            throws Throwable {
+                        super.afterHookedMethod(param);
+                        // Hook函数之后执行的代码
+                        // param.thisObject 获取当前对象
+                        // param.thisObject.getClass() 获取类
+                        Class<?> clazz = param.thisObject.getClass();
+                        XposedBridge.log("要hook的方法所在的类：" + clazz.getName());
+
+                        // 获取方法的返回值
+                        Object resultString = param.getResult();
+                        XposedBridge.log("返回值：" + resultString.toString());
+                        // 修改方法的返回值
+                        param.setResult(resultString.toString() + " || was hooked!");
+                    }
+                });
+
+        /*
+         * Hook 匿名内部类(所有调用这个内部类都会被hook)
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.ABClass", // 被Hook函数所在的类(包名+类名)
                 loadPackageParam.classLoader,
@@ -91,7 +136,7 @@ public class Arrow implements IXposedHookLoadPackage {
                         for (int i = 0; i < wodelogs.length; i++) {
                             XposedBridge.log("查看堆栈：" + wodelogs[i].toString());
                         }
-                        param.args[0] = "hook 后更改的值";
+                        param.args[0] = "hook后更改的值";  //更改传入参数
                     }
 
                     @Override
@@ -106,7 +151,7 @@ public class Arrow implements IXposedHookLoadPackage {
                 });
 
         /*
-         * Hook 匿名内部类 2
+         * Hook 匿名内部类 2 (只有当com.my.xposedtargetdemo.MainActivity 调用这个内部类时才会走)
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.MainActivity$2", // 被Hook函数所在的类(包名+类名)
                 loadPackageParam.classLoader,
@@ -127,7 +172,7 @@ public class Arrow implements IXposedHookLoadPackage {
                         for (int i = 0; i < wodelogs.length; i++) {
                             XposedBridge.log("查看堆栈：" + wodelogs[i].toString());
                         }
-                        param.args[0] = "hook 后更改的值 2";
+                        param.args[0] = "hook后更改的值2"; //更改传入参数
                     }
 
                     @Override
