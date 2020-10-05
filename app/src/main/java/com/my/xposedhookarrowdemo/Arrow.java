@@ -1,5 +1,6 @@
 package com.my.xposedhookarrowdemo;
 
+import android.app.Activity;
 import android.net.wifi.WifiInfo;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -10,6 +11,7 @@ import java.net.InetAddress;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -29,7 +31,8 @@ public class Arrow implements IXposedHookLoadPackage {
          * Hook普通方法
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.Util", // 被Hook函数所在的类(包名+类名)
-                loadPackageParam.classLoader, "ordinaryFunc", // 被Hook函数的名称ordinaryFunc
+                loadPackageParam.classLoader,
+                "ordinaryFunc", // 被Hook函数的名称ordinaryFunc
                 String.class, // 被Hook函数的第一个参数String
                 String.class, // 被Hook函数的第二个参数String
                 int.class,// 被Hook函数的第三个参数integer
@@ -66,6 +69,20 @@ public class Arrow implements IXposedHookLoadPackage {
                         XposedBridge.log("返回值：" + resultString.toString());
                         // 修改方法的返回值
                         param.setResult("ordinaryFunc was hooked!");
+                    }
+                });
+
+        /*
+         * Hook 后替换原来方法(原来方法不再调用)
+         */
+        XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.Util", // 被Hook函数所在的类(包名+类名)
+                loadPackageParam.classLoader,
+                "replace_target_fun", // 被Hook函数的名称replace_target_fun
+                Activity.class, // 被Hook函数的第一个参数Activity
+                new XC_MethodReplacement() {
+                    @Override
+                    protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                        return "Happy ! You hook it!";
                     }
                 });
 
@@ -283,7 +300,7 @@ public class Arrow implements IXposedHookLoadPackage {
                 });
 
         /**
-         * 拦截系统方法 篡改IMEI设备号
+         * hook系统方法 更改IMEI设备号
          * */
         XposedBridge.hookAllMethods(TelephonyManager.class, "getImei",
                 new XC_MethodHook() {
@@ -305,7 +322,7 @@ public class Arrow implements IXposedHookLoadPackage {
                 });
 
         /**
-         * 拦截流量上网IP地址
+         * hook流量上网IP地址
          * */
         XposedHelpers.findAndHookMethod(InetAddress.class, "getHostAddress",
                 new XC_MethodHook() {
@@ -319,7 +336,7 @@ public class Arrow implements IXposedHookLoadPackage {
                 });
 
         /**
-         * 拦截WiFi上网IP地址
+         * hook WiFi上网IP地址
          * */
         XposedHelpers.findAndHookMethod(WifiInfo.class, "getIpAddress",
                 new XC_MethodHook() {
