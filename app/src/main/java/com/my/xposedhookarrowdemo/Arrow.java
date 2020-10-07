@@ -1,6 +1,7 @@
 package com.my.xposedhookarrowdemo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -20,7 +21,7 @@ public class Arrow implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         // TODO Auto-generated method stub
-        XposedBridge.log("Loaded app ==== go here === is success");
+        XposedBridge.log("Loaded app ================ hook program is start!");
         // 不是需要 Hook 的包直接返回
         if (!loadPackageParam.packageName.equals("com.my.xposedtargetdemo"))
             return;
@@ -384,6 +385,51 @@ public class Arrow implements IXposedHookLoadPackage {
                         XposedBridge.log("============= staic function ============");
                     }
                 });
+
+
+        /*
+         * 带壳hook。如果下面的代码要运行，需要先将待hook apk 进行加固。
+         * 目前被hook apk还没加固,代码运行到这会找不到com.stub.StubApp类，会报错，就先把代码注释掉，如果待hook apk加固后 就可以放开下面的代码了。
+         */
+        //1、 先hook类加载器
+/*        XposedHelpers.findAndHookMethod("com.stub.StubApp", loadPackageParam.classLoader,
+                "attachBaseContext", Context.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
+                        Context context = (Context) param.args[0];
+                        if (context != null) {
+                            final ClassLoader classLoader = context.getClassLoader();//获取到加壳程序的类加载器
+                            if (classLoader != null) {
+
+                                //2、 用上文中获取的类加载器作为参数 hook apk中对应的方法，用法没有区别
+                                XposedHelpers.findAndHookMethod(
+                                        "com.my.xposedtargetdemo.Util", // 被Hook函数所在的类(包名+类名)
+                                        classLoader, //直接使用 上面获取的 classLoader
+                                        "ordinaryFunc", // 被Hook函数的名称ordinaryFunc
+                                        String.class, // 被Hook函数的第一个参数String
+                                        String.class, // 被Hook函数的第二个参数String
+                                        int.class,// 被Hook函数的第三个参数integer
+                                        new XC_MethodHook() {
+                                            @Override
+                                            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                                                super.afterHookedMethod(param);
+                                                // 修改方法的返回值
+                                                param.setResult("In shell,ordinaryFunc was hooked!");
+                                            }
+                                        });
+
+                            }
+                        }
+                    }
+                });*/
+
+
     }
 
     public static long ipToLong(String strIp) {
