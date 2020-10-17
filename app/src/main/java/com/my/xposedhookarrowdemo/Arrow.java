@@ -1,7 +1,6 @@
 package com.my.xposedhookarrowdemo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -204,6 +203,44 @@ public class Arrow implements IXposedHookLoadPackage {
                     }
                 });
 
+
+        /*
+         * Hook 静态内部类
+         */
+        XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.StaticInnerClass$Inner", // 被Hook函数所在的类(包名+类名&内部类名)
+                loadPackageParam.classLoader,
+                "func1", // 被Hook函数的名称say2
+                String.class,//第1个参数
+                new XC_MethodHook() {
+
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param)
+                            throws Throwable {
+                        super.beforeHookedMethod(param);
+                        // Hook函数之前执行的代码
+                        // 打印堆栈查看调用关系
+                        StackTraceElement[] wodelogs = new Throwable("wodelog")
+                                .getStackTrace();
+                        for (int i = 0; i < wodelogs.length; i++) {
+                            XposedBridge.log("查看堆栈：" + wodelogs[i].toString());
+                        }
+                        param.args[0] = "p_hooked"; //更改传入参数
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param)
+                            throws Throwable {
+                        super.afterHookedMethod(param);
+                        // Hook函数之后执行的代码
+                        // 获取类
+                        Class<?> clazz = param.thisObject.getClass();
+                        XposedBridge.log("要hook的方法所在的类：" + clazz.getName());
+                        // 修改方法的返回值
+                        param.setResult("It was hooked!");
+                    }
+                });
+
+
         /**
          * HOOK构造方法
          * */
@@ -226,8 +263,7 @@ public class Arrow implements IXposedHookLoadPackage {
                             throws Throwable {
                         // TODO Auto-generated method stub
                         super.afterHookedMethod(param);
-                        XposedBridge
-                                .log("============= constructor ============");
+                        XposedBridge.log("============= constructor ============");
                         XposedBridge.log("开始获取属性：");
                         Field[] fields = param.thisObject.getClass()
                                 .getDeclaredFields();
