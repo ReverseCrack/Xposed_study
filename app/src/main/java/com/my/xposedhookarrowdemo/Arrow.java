@@ -245,8 +245,13 @@ public class Arrow implements IXposedHookLoadPackage {
          * HOOK构造方法
          * */
         XposedHelpers.findAndHookConstructor("com.my.xposedtargetdemo.Student",
-                loadPackageParam.classLoader, String.class, String.class, int.class,
-                double.class, boolean.class, new XC_MethodHook() {
+                loadPackageParam.classLoader,
+                String.class,
+                String.class,
+                int.class,
+                double.class,
+                boolean.class,
+                new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param)
                             throws Throwable {
