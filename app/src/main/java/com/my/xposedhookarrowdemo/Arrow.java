@@ -19,13 +19,11 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class Arrow implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        // TODO Auto-generated method stub
-        XposedBridge.log("Loaded app ================ hook program is start!");
         // 不是需要 Hook 的包直接返回
         if (!loadPackageParam.packageName.equals("com.my.xposedtargetdemo"))
             return;
 
-        XposedBridge.log("app包名：" + loadPackageParam.packageName);
+//        XposedBridge.log("app包名：" + loadPackageParam.packageName);
 
         /*
          * Hook普通方法
@@ -406,7 +404,10 @@ public class Arrow implements IXposedHookLoadPackage {
          * Hook staic 方法
          */
         XposedHelpers.findAndHookMethod("com.my.xposedtargetdemo.Util",
-                loadPackageParam.classLoader, "myInfo", String.class, int.class,
+                loadPackageParam.classLoader,
+                "myInfo",
+                String.class,
+                int.class,
                 new XC_MethodHook() {
 
                     @Override
@@ -423,6 +424,11 @@ public class Arrow implements IXposedHookLoadPackage {
                     protected void afterHookedMethod(MethodHookParam param)
                             throws Throwable {
                         super.afterHookedMethod(param);
+                        /*XposedBridge.log("param.thisObject : " + param.thisObject);
+                        XposedBridge.log("param.getClass() : " + param.getClass());
+                        XposedBridge.log("param.thisObject.getClass() : " + param.thisObject.getClass());*/
+                        //以上三种方式皆无效,要获取到类得用 XposedHelpers.findClass();
+
                         XposedBridge.log("============= staic function ============");
                     }
                 });
