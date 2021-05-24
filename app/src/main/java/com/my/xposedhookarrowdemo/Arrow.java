@@ -339,66 +339,6 @@ public class Arrow implements IXposedHookLoadPackage {
                     }
                 });
 
-        /**
-         * hook系统方法 更改IMEI设备号
-         * */
-        XposedBridge.hookAllMethods(TelephonyManager.class, "getImei",
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param)
-                            throws Throwable {
-                        // TODO Auto-generated method stub
-                        super.beforeHookedMethod(param);
-                    }
-
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param)
-                            throws Throwable {
-                        // TODO Auto-generated method stub
-                        super.afterHookedMethod(param);
-                        XposedBridge.log("imei：" + param.getResult());
-                        param.setResult("999999");
-                    }
-                });
-
-        /**
-         * hook流量上网IP地址
-         * */
-        XposedHelpers.findAndHookMethod(InetAddress.class, "getHostAddress",
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param)
-                            throws Throwable {
-                        super.afterHookedMethod(param);
-                        XposedBridge.log("流量 IP地址：" + param.getResult());
-                        param.setResult("192.168.1.99 (is hooked)");
-                    }
-                });
-
-        /**
-         * hook WiFi上网IP地址
-         * */
-        XposedHelpers.findAndHookMethod(WifiInfo.class, "getIpAddress",
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param)
-                            throws Throwable {
-                        super.afterHookedMethod(param);
-                        XposedBridge.log("WIFI IP地址：" + param.getResult());
-                        // 分割字符串
-                        String[] str = "192.99.99.99".split("\\.");
-                        // 定义一个字符串，用来存储反转后的IP地址
-                        String ipAdress = "";
-                        // for循环控制IP地址反转
-                        for (int i = 3; i >= 0; i--) {
-                            ipAdress = ipAdress + str[i] + ".";
-                        }
-                        // 去除最后一位的"."
-                        ipAdress = ipAdress.substring(0, ipAdress.length() - 1);
-                        // 返回新的整形IP地址
-                        param.setResult((int) ipToLong(ipAdress));
-                    }
-                });
 
         /*
          * Hook staic 方法
@@ -479,17 +419,4 @@ public class Arrow implements IXposedHookLoadPackage {
 
     }
 
-    public static long ipToLong(String strIp) {
-        long[] ip = new long[4];
-        // 先找到IP地址字符串中.的位置
-        int position1 = strIp.indexOf(".");
-        int position2 = strIp.indexOf(".", position1 + 1);
-        int position3 = strIp.indexOf(".", position2 + 1);
-        // 将每个.之间的字符串转换成整形
-        ip[0] = Long.parseLong(strIp.substring(0, position1));
-        ip[1] = Long.parseLong(strIp.substring(position1 + 1, position2));
-        ip[2] = Long.parseLong(strIp.substring(position2 + 1, position3));
-        ip[3] = Long.parseLong(strIp.substring(position3 + 1));
-        return (ip[0] << 24) + (ip[1] << 16) + (ip[2] >> 8) + ip[3];
-    }
 }
